@@ -1,0 +1,223 @@
+.container {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.headerIcon {
+  color: var(--color-primary);
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+.signedOutContainer {
+  text-align: center;
+  padding: var(--spacing-2xl) 0;
+}
+
+.signedOutTitle {
+  font-family: var(--font-heading);
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.signedOutText {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.plansGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+}
+
+@media (min-width: 768px) {
+  .plansGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.planCard {
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--color-border);
+  padding: var(--spacing-xl);
+  position: relative;
+  transition: all var(--transition-base);
+}
+
+.planCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.planCardPopular {
+  border-color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+.planCardPopular:hover {
+  transform: scale(1.05) translateY(-4px);
+}
+
+.popularBadge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: var(--color-text-white);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+}
+
+.planHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.planName {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.priceContainer {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.price {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.period {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.featureItemDisabled {
+  opacity: 0.5;
+}
+
+.featureIcon {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.featureIconCheck {
+  color: var(--color-success);
+}
+
+.featureIconCross {
+  color: var(--color-text-tertiary);
+}
+
+.featureText {
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.featureTextDisabled {
+  color: var(--color-text-tertiary);
+  text-decoration: line-through;
+}
+
+.planButton {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-family: var(--font-primary);
+  transition: all var(--transition-base);
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.planButtonPrimary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: var(--color-text-white);
+  box-shadow: var(--shadow-md);
+}
+
+.planButtonPrimary:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-secondary-dark) 100%);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.planButtonSecondary {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.planButtonSecondary:hover {
+  background-color: var(--color-border);
+  transform: translateY(-1px);
+}
+
+.note {
+  margin-top: var(--spacing-2xl);
+  background-color: var(--color-warning-light);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+}
+
+.noteText {
+  color: var(--color-warning);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.noteTextStrong {
+  font-weight: 700;
+}
+

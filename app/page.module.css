@@ -1,0 +1,243 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+}
+
+.heroSection {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.heroContent {
+  text-align: center;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xl);
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .heroTitle {
+    font-size: 3.75rem;
+  }
+}
+
+.heroTitleAccent {
+  color: var(--color-primary);
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2xl);
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .heroSubtitle {
+    font-size: 1.5rem;
+  }
+}
+
+.heroButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .heroButtons {
+    flex-direction: row;
+  }
+}
+
+.featuresSection {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md);
+  background-color: var(--color-bg-secondary);
+}
+
+.featuresHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.featuresTitle {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.featuresSubtitle {
+  font-size: 1.25rem;
+  color: var(--color-text-secondary);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-2xl);
+}
+
+@media (min-width: 768px) {
+  .featuresGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.featureCard {
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-2xl);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-base);
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.featureIconWrapper {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  width: fit-content;
+  margin-bottom: var(--spacing-md);
+}
+
+.featureIconWrapperBlue {
+  background-color: var(--color-info-light);
+}
+
+.featureIconWrapperPurple {
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+.featureIconWrapperGreen {
+  background-color: var(--color-success-light);
+}
+
+.featureIconBlue {
+  color: var(--color-info);
+}
+
+.featureIconPurple {
+  color: var(--color-secondary);
+}
+
+.featureIconGreen {
+  color: var(--color-success);
+}
+
+.featureCardTitle {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.featureCardDescription {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.6;
+}
+
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.featureListItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-primary);
+}
+
+.featureCheckIcon {
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+.ctaSection {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.ctaCard {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--color-text-white);
+}
+
+.ctaTitle {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.ctaSubtitle {
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-2xl);
+  opacity: 0.9;
+}
+
+.redirectContainer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md);
+  text-align: center;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin: 0 auto var(--spacing-md);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.redirectText {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.redirectLink {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--transition-base);
+}
+
+.redirectLink:hover {
+  text-decoration: underline;
+}
+
