@@ -170,6 +170,24 @@
   color: var(--color-text-primary);
   font-family: var(--font-primary);
   line-height: 1.7;
+  position: relative;
+}
+
+.typingIndicator {
+  display: inline-block;
+  color: var(--color-primary);
+  font-weight: bold;
+  animation: blink 1s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
 }
 
 .loadingSpinner {

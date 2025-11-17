@@ -1,42 +1,29 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function POST(request) {
   try {
-    // Check if OpenAI API key is configured
-    if (!process.env.OPENAI_API_KEY) {
-      console.error('OPENAI_API_KEY is not configured');
-      return NextResponse.json(
-        { error: 'OpenAI API key is not configured. Please add OPENAI_API_KEY to your environment variables.' },
-        { status: 500 }
-      );
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Gemini API key is not configured' }, { status: 500 });
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
+    const genAI = new GoogleGenerativeAI(apiKey);
 
     const { userId } = await auth();
-    
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { prompt, type = 'content' } = await request.json();
+    const body = await request.json();
+    const { prompt, type = 'content', stream = false } = body;
 
-    if (!prompt) {
-      return NextResponse.json(
-        { error: 'Prompt is required' },
-        { status: 400 }
-      );
+    if (!prompt || typeof prompt !== 'string') {
+      return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
     let systemPrompt = 'You are a helpful AI content writer.';
-    
     if (type === 'blog') {
       systemPrompt = 'You are an expert blog writer. Write engaging, SEO-friendly blog posts.';
     } else if (type === 'social') {
@@ -45,55 +32,116 @@ export async function POST(request) {
       systemPrompt = 'You are a copywriting expert. Write compelling ad copy.';
     }
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', // Using gpt-3.5-turbo as default (cheaper and more available)
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 1000,
-      temperature: 0.7,
-    });
+    const fullPrompt = `${systemPrompt}\n\n${prompt}`;
 
-    const content = completion.choices[0]?.message?.content || '';
+    const modelsToTry = ['gemini-2.5-flash'];
 
-    return NextResponse.json({ 
+    // If streaming is requested, use streaming API
+    if (stream) {
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        async start(controller) {
+          try {
+            let model = null;
+            let lastError = null;
+
+            for (const modelName of modelsToTry) {
+              try {
+                model = genAI.getGenerativeModel({
+                  model: modelName,
+                  generationConfig: { maxOutputTokens: 1000, temperature: 0.7 },
+                });
+                break;
+              } catch (err) {
+                lastError = err;
+                console.warn(`Model ${modelName} failed:`, err);
+              }
+            }
+
+            if (!model) {
+              throw lastError || new Error('No model succeeded');
+            }
+
+            const result = await model.generateContentStream(fullPrompt);
+            
+            for await (const chunk of result.stream) {
+              const chunkText = chunk.text();
+              if (chunkText) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: chunkText, done: false })}\n\n`));
+              }
+            }
+
+            // Send completion signal
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
+            controller.close();
+          } catch (error) {
+            console.error('Streaming error:', error);
+            const errorMessage = error.message || 'Failed to generate content';
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errorMessage, done: true })}\n\n`));
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        },
+      });
+    }
+
+    // Non-streaming response (fallback)
+    let result = null;
+    let lastError = null;
+
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          generationConfig: { maxOutputTokens: 1000, temperature: 0.7 },
+        });
+
+        result = await model.generateContent(fullPrompt);
+        break;
+      } catch (err) {
+        lastError = err;
+        console.warn(`Model ${modelName} failed:`, err);
+      }
+    }
+
+    if (!result) throw lastError || new Error('No model succeeded');
+
+    const response = await result.response;
+    const content = response.text() || '';
+
+    return NextResponse.json({
       content,
-      usage: completion.usage 
+      usage: {
+        promptTokens: response.usageMetadata?.promptTokenCount || 0,
+        completionTokens: response.usageMetadata?.candidatesTokenCount || 0,
+        totalTokens: response.usageMetadata?.totalTokenCount || 0,
+      },
     });
   } catch (error) {
-    console.error('OpenAI API Error:', error);
-    
-    // Provide more specific error messages
+    console.error('Gemini API Error:', error);
     let errorMessage = 'Failed to generate content';
     let statusCode = 500;
-    
-    // Check for specific OpenAI API errors
-    if (error.status === 429 || error.message?.includes('quota') || error.message?.includes('exceeded')) {
-      errorMessage = 'OpenAI API quota exceeded. Please check your plan and billing details at https://platform.openai.com/account/billing';
+
+    if (error.status === 429 || error.message?.toLowerCase().includes('quota')) {
+      errorMessage = 'Gemini API quota exceeded. Please check your usage / billing.';
       statusCode = 429;
-    } else if (error.message?.includes('API key') || error.status === 401) {
-      errorMessage = 'Invalid OpenAI API key. Please check your environment variables.';
+    } else if (error.status === 401 || error.message?.toLowerCase().includes('invalid') || error.message?.toLowerCase().includes('key')) {
+      errorMessage = 'Invalid Gemini API key.';
       statusCode = 401;
-    } else if (error.message?.includes('rate limit') || error.status === 429) {
-      errorMessage = 'Rate limit exceeded. Please try again later.';
+    } else if (error.message?.toLowerCase().includes('rate limit')) {
+      errorMessage = 'Rate limit exceeded.';
       statusCode = 429;
-    } else if (error.message?.includes('insufficient_quota')) {
-      errorMessage = 'OpenAI API quota exceeded. Please add credits to your account at https://platform.openai.com/account/billing';
-      statusCode = 429;
-    } else {
-      errorMessage = error.message || 'Failed to generate content';
+    } else if (error.message) {
+      errorMessage = error.message;
     }
-    
-    return NextResponse.json(
-      { 
-        error: errorMessage, 
-        details: error.message,
-        status: error.status,
-        helpUrl: statusCode === 429 ? 'https://platform.openai.com/account/billing' : undefined
-      },
-      { status: statusCode }
-    );
+
+    return NextResponse.json({ error: errorMessage, details: error.message }, { status: statusCode });
   }
 }
-
