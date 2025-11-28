@@ -25,7 +25,7 @@ export default function AIContentPage() {
     setIsComplete(false);
 
     try {
-      const response = await fetch('/api/openai', {
+      const response = await fetch('/api/ai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,41 +67,81 @@ export default function AIContentPage() {
       const decoder = new TextDecoder();
       let buffer = '';
 
-      while (true) {
-        const { done, value } = await reader.read();
-        
-        if (done) break;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) {
+            // Process any remaining buffer data
+            if (buffer.trim()) {
+              const lines = buffer.split('\n\n').filter(line => line.trim());
+              for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                  try {
+                    const data = JSON.parse(line.slice(6));
+                    
+                    if (data.error) {
+                      toast.error(data.error);
+                      setLoading(false);
+                      return;
+                    }
+                    
+                    if (data.content) {
+                      setContent(prev => prev + data.content);
+                    }
+                    
+                    if (data.done) {
+                      setIsComplete(true);
+                      setLoading(false);
+                      toast.success('Content generated successfully!');
+                      return;
+                    }
+                  } catch (e) {
+                    console.error('Error parsing SSE data:', e);
+                  }
+                }
+              }
+            }
+            break;
+          }
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n\n');
-        buffer = lines.pop() || '';
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n\n');
+          buffer = lines.pop() || '';
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(line.slice(6));
-              
-              if (data.error) {
-                toast.error(data.error);
-                setLoading(false);
-                return;
+          for (const line of lines) {
+            if (line.trim() && line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                
+                if (data.error) {
+                  toast.error(data.error);
+                  setLoading(false);
+                  return;
+                }
+                
+                if (data.content) {
+                  setContent(prev => prev + data.content);
+                }
+                
+                if (data.done) {
+                  setIsComplete(true);
+                  setLoading(false);
+                  toast.success('Content generated successfully!');
+                  return;
+                }
+              } catch (e) {
+                console.error('Error parsing SSE data:', e, 'Line:', line);
               }
-              
-              if (data.content) {
-                setContent(prev => prev + data.content);
-              }
-              
-              if (data.done) {
-                setIsComplete(true);
-                setLoading(false);
-                toast.success('Content generated successfully!');
-                return;
-              }
-            } catch (e) {
-              console.error('Error parsing SSE data:', e);
             }
           }
         }
+        
+        // If we reach here, stream ended without done signal
+        setIsComplete(true);
+        setLoading(false);
+      } finally {
+        reader.releaseLock();
       }
     } catch (error) {
       console.error('Generation error:', error);

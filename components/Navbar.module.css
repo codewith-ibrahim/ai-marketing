@@ -34,3 +34,11 @@
   gap: var(--spacing-md);
 }
 
+.actions img {
+  object-position: top;
+}
+
+.cl-avatarBox img {
+  object-position: top;
+}
+
