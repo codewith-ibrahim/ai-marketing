@@ -2,13 +2,33 @@
   min-height: 100vh;
   background-color: var(--color-bg-primary);
 }
-
+/* 
 .heroSection {
   height: 95svh;
   max-width: 80rem;
   margin: 0 auto;
   align-content: center;
-  /* padding: var(--spacing-xl) var(--spacing-md); */
+  background-image: url('/images/hero-bg.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+} */
+
+
+.heroSection {
+  height: 95svh;
+  /* max-width: 80rem; */
+  width: 100%;
+  margin: 0 auto;
+  align-content: center;
+
+  background: 
+    linear-gradient(to bottom, #000000de, #00000080),
+    url('/images/banner.jpg');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .heroContent {
@@ -21,7 +41,7 @@
   font-family: var(--font-heading);
   font-size: 3rem;
   font-weight: 800;
-  color: var(--color-text-primary);
+  color: var(--color-text-white);
   margin-bottom: var(--spacing-xl);
   line-height: 1.1;
 }
@@ -38,7 +58,7 @@
 
 .heroSubtitle {
   font-size: 1.25rem;
-  color: var(--color-text-secondary);
+  color: var(--color-text-white);
   margin-bottom: var(--spacing-2xl);
   line-height: 1.6;
 }
